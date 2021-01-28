@@ -29,6 +29,12 @@ namespace Bank.Business.Portifolio.InfraStructure.CrossCutting.FileHandle.Strate
                         str = pdf.GetTxt(endpoint);
                         break;
                     }
+                case ".msg":
+                    {
+                        Email email = new Email();
+                        str = email.GetTxt(endpoint);
+                        break;
+                    }
                 case ".doc":
                 case ".docx":
                     {

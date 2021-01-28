@@ -40,22 +40,29 @@ namespace Bank.Business.Portifolio.Presenter
         public static string GetFile(string endPoint)
         {
             StringBuilder Sb = new StringBuilder();
-            var container = new Container();
-            var lifeStyle = Lifestyle.Singleton;
-            container.Register<IBusinessAppService, BusinessAppService>(lifeStyle);
-            container.Register<IFileHandle, FileHandleStrategy>(lifeStyle);
-            container.Register<IBusinessService, BusinessService>(lifeStyle);
-            container.Register<IBusinessRespository, BusinessRepository>(lifeStyle);
-            container.Register<IClientRepository, ClientRepository>(lifeStyle);
-            container.Register<ICategoryBusinessRespository, CategoryBusinessRespository>(lifeStyle);
-            container.Register<IPaymentRepository, PaymentRepository>(lifeStyle);
-             
-            var bl = container.GetInstance<IBusinessAppService>();
-            
-            var result = bl.AddBusiness(endPoint);
-            foreach(var item in result)
+            try
             {
-                Sb.AppendLine(item);
+                var container = new Container();
+                var lifeStyle = Lifestyle.Singleton;
+                container.Register<IBusinessAppService, BusinessAppService>(lifeStyle);
+                container.Register<IFileHandle, FileHandleStrategy>(lifeStyle);
+                container.Register<IBusinessService, BusinessService>(lifeStyle);
+                container.Register<IBusinessRespository, BusinessRepository>(lifeStyle);
+                container.Register<IClientRepository, ClientRepository>(lifeStyle);
+                container.Register<ICategoryBusinessRespository, CategoryBusinessRespository>(lifeStyle);
+                container.Register<IPaymentRepository, PaymentRepository>(lifeStyle);
+
+                var bl = container.GetInstance<IBusinessAppService>();
+
+                var result = bl.AddBusiness(endPoint);
+                foreach (var item in result)
+                {
+                    Sb.AppendLine(item);
+                }
+            }
+            catch(Exception ex)
+            {
+                Sb.AppendLine(ex.Message.ToString());
             }
             return Sb.ToString();
         }

@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileHandle\Email.cs" />
     <Compile Include="FileHandle\Excel.cs" />
     <Compile Include="FileHandle\Pdf.cs" />
     <Compile Include="FileHandle\Strategy\FileHandleStrategy.cs" />

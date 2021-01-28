@@ -2,6 +2,7 @@
 using Bank.Business.Portifolio.Domain.Interfaces.ICrossCutting;
 using Bank.Business.Portifolio.Domain.Interfaces.IRepositories;
 using Bank.Business.Portifolio.Domain.Interfaces.IServicesDomain;
+using System;
 
 namespace Bank.Business.Portifolio.Application
 {
@@ -17,8 +18,16 @@ namespace Bank.Business.Portifolio.Application
         }
         public string[] AddBusiness(string endpoint)
         {
-            var result = _FileHandle.GetFileText(endpoint);
-            _BusinessService.ValidateTxt(result);
+            string[] result = Array.Empty<string>();
+            try
+            {
+                result = _FileHandle.GetFileText(endpoint);
+                _BusinessService.ValidateTxt(result);
+            }
+            catch
+            {
+                throw;
+            }
             return result;
         }
     }
