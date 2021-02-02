@@ -1,7 +1,10 @@
-﻿namespace Bank.Business.Portifolio.Application.Interfaces
+﻿using Bank.Business.Portifolio.Domain.Dto;
+using System.Collections.Generic;
+
+namespace Bank.Business.Portifolio.Application.Interfaces
 {
     public interface IBusinessAppService
     {
-        string[] AddBusiness(string endpoint);
+        List<Trade> AddBusiness(string endpoint);
     }
 }

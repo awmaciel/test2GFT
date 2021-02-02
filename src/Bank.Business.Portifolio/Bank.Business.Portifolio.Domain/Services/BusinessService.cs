@@ -1,4 +1,5 @@
-﻿using Bank.Business.Portifolio.Domain.Interfaces.IRepositories;
+﻿using Bank.Business.Portifolio.Domain.Dto;
+using Bank.Business.Portifolio.Domain.Interfaces.IRepositories;
 using Bank.Business.Portifolio.Domain.Interfaces.IServicesDomain;
 using System;
 using System.Collections.Generic;
@@ -22,19 +23,22 @@ namespace Bank.Business.Portifolio.Domain.Services
             _CategoryRepository = CategoryRepository;
             _PaymentRepository = PaymentRepository;
         }
-        public string[] ValidateTxt(string[] LinesTxt)
+        public List<Trade> ValidateTxt(string[] LinesTxt)
         {
-            string[] str = Array.Empty<string>();
+            List<Trade> str = new  List<Trade>();
             Domain.Entities.Business business = new Domain.Entities.Business();
 
             if (business.ValidateTxt(LinesTxt))
                 InputDataTxt(LinesTxt);
             else
-                str = new string[1] { "O arquivo não possui uma formatação correto" };
+            {
+                str[0].Note = "O arquivo não possui uma formatação correto";
+                return str;
+            }
 
-            return str;
+            return GetClientByBusinessCategory();
         }
-        public void InputDataTxt(string[] LinesTxt)
+        private void InputDataTxt(string[] LinesTxt)
         {
             int cont = 0;
             Domain.Entities.Business business = new Domain.Entities.Business();
@@ -58,10 +62,28 @@ namespace Bank.Business.Portifolio.Domain.Services
                 }
 
                 cont++;
-            }
+            }            
         }
 
+        private List<Trade> GetClientByBusinessCategory()
+        {
+            var result = _BusinessRespository.GetClientByCategories();
+            Trade trade = null;
+            List<Trade> LstTrade = new List<Trade>();
 
+            foreach (var item in result)
+            {
+                trade = new Trade();
+                trade.NameClient = item.Client.NameClient;
+                trade.SectorClient = item.Client.SectorClient;
+                trade.CategoryClient = item.CategoryBusiness.NameCategory;
+                trade.NamePortifolio = item.Portifolio.NameProtifolio;
+                trade.ValueInvestment = item.ValueBusiness;
+                trade.DateNextPayment = _PaymentRepository.GetAll().Where(x => x.IdBusiness == item.IdBusiness).Select(c => c.DateTimeNextPayment).LastOrDefault();
+                LstTrade.Add(trade);
+            }
+            return LstTrade;
+        }
         private (Domain.Entities.Business, Domain.Entities.Payment) InputDataTxtAux(string[] LinesTxt, Domain.Entities.Business business)
         {
             int contArr = 0;
@@ -90,7 +112,7 @@ namespace Bank.Business.Portifolio.Domain.Services
             business.IdClient = 1;
             business.DateRegister = DateTime.Now;
             business.DateUpdate = null;
-            var IdCategoryBusiness = ValidateClient(business.IdClient, business.ValueBusiness);
+            var IdCategoryBusiness = ValidateClient(business.IdClient, business,pay);
 
             if (IdCategoryBusiness != 0)
                 business.IdCategoryBusiness = IdCategoryBusiness;
@@ -99,20 +121,20 @@ namespace Bank.Business.Portifolio.Domain.Services
         }            
 
         /*Return Category Client*/
-        private int ValidateClient(int IdClient, decimal valueBusiness)
-        {
+        private int ValidateClient(int IdClient, Domain.Entities.Business Business, Entities.Payment pay)
+        {            
             var client = _ClientRepository.GetById(IdClient);
-            if (valueBusiness < 1000000 && client.SectorClient == "Private")
-                return 1; 
-            else if(valueBusiness > 1000000 && client.SectorClient == "Private")
+            if (Business.ValueBusiness < 1000000 && client.SectorClient == "Private" && !(pay.DateTimeNextPayment.Subtract(Business.DateReference).Days < -30))
+                return 4; 
+            else if(Business.ValueBusiness > 1000000 && client.SectorClient == "Private" && !(pay.DateTimeNextPayment.Subtract(Business.DateReference).Days < -30))
                 return 3;
 
-            if (valueBusiness < 1000000 && client.SectorClient == "Public")
-                return 1;
-            else if (valueBusiness > 1000000 && client.SectorClient == "Public")
-                return 2;
+            if (Business.ValueBusiness < 1000000 && client.SectorClient == "Public" && !(pay.DateTimeNextPayment.Subtract(Business.DateReference).Days < -30))
+                return 4;
+            else if (Business.ValueBusiness > 1000000 && client.SectorClient == "Public")
+                return 3;            
 
-            return 0;
+            return 1;
         }
     }
 }

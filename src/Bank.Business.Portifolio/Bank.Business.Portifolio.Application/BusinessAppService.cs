@@ -1,8 +1,10 @@
 ﻿using Bank.Business.Portifolio.Application.Interfaces;
+using Bank.Business.Portifolio.Domain.Dto;
 using Bank.Business.Portifolio.Domain.Interfaces.ICrossCutting;
 using Bank.Business.Portifolio.Domain.Interfaces.IRepositories;
 using Bank.Business.Portifolio.Domain.Interfaces.IServicesDomain;
 using System;
+using System.Collections.Generic;
 
 namespace Bank.Business.Portifolio.Application
 {
@@ -16,19 +18,19 @@ namespace Bank.Business.Portifolio.Application
             _FileHandle = FileHandle;
             _BusinessService = BusinessService;
         }
-        public string[] AddBusiness(string endpoint)
+        public List<Trade> AddBusiness(string endpoint)
         {
-            string[] result = Array.Empty<string>();
+            List<Trade> resultReturn = null;
             try
             {
-                result = _FileHandle.GetFileText(endpoint);
-                _BusinessService.ValidateTxt(result);
+                string[]  result = _FileHandle.GetFileText(endpoint);
+                resultReturn = _BusinessService.ValidateTxt(result);
             }
-            catch
+            catch(Exception ex)
             {
                 throw;
             }
-            return result;
+            return resultReturn;
         }
     }
 }

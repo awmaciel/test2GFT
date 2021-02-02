@@ -15,7 +15,7 @@ using System.Text;
 namespace Bank.Business.Portifolio.Presenter
 {
     class Program
-    {        
+    {
         static void Main(string[] args)
         {
             SimpleInjectorInitializer.Initialize();
@@ -55,12 +55,21 @@ namespace Bank.Business.Portifolio.Presenter
                 var bl = container.GetInstance<IBusinessAppService>();
 
                 var result = bl.AddBusiness(endPoint);
+
+
+                string print = $"   Name Client -  Sector -  Category - Portifolio -   Value -   Date next payment";
+                Console.WriteLine(print);
+                Console.WriteLine("");
+                Console.WriteLine("");
+
                 foreach (var item in result)
                 {
-                    Sb.AppendLine(item);
+                    print = "";
+                    print = $"{item.NameClient} - {item.SectorClient} - {item.CategoryClient} - {item.NamePortifolio} - {item.ValueInvestment} {item.DateNextPayment} - {item.Note}".ToString();
+                    Console.WriteLine(print);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Sb.AppendLine(ex.Message.ToString());
             }
